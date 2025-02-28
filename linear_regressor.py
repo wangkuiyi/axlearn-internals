@@ -1,10 +1,12 @@
-import jax
-import jax.numpy as jnp
+import math
+
 import flax.linen
 import flax.training.train_state
+import jax
+import jax.numpy as jnp
 import optax
-import math
 from axlearn.common import config as ax_config
+from axlearn.experiments.trainer_config_utils import TrainerConfigFn
 
 
 class LinearDataset:
@@ -13,7 +15,7 @@ class LinearDataset:
         self._batch_size = batch_size
         self.batches = self._synthesize(2000, true_a, true_b)
 
-    def _synthesize(self, num_samples: int, a: float, b: float) -> tuple[jax.Array, jax.Array]:
+    def _synthesize(self, num_samples: int, a: float, b: float):
         self._rng, x_key, noise_key = jax.random.split(self._rng, 3)
         x = jax.random.uniform(x_key, shape=(num_samples, 1), minval=-10.0, maxval=10.0)
         noise = jax.random.normal(noise_key, shape=(num_samples, 1)) * 0.1
@@ -121,9 +123,6 @@ def test_config_trainer():
     )
     tr = cfg.instantiate()
     tr.print(tr.train())
-
-
-from axlearn.experiments.trainer_config_utils import TrainerConfigFn
 
 
 def named_trainer_configs() -> dict[str, TrainerConfigFn]:

@@ -1,26 +1,13 @@
-import torch
+import axlearn.common.config as ax
 import datasets
+import torch
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
-    TrainingArguments,
-    Trainer,
     DataCollatorForLanguageModeling,
+    Trainer,
+    TrainingArguments,
 )
-import pprint
-import axlearn.common.config as ax
-
-
-MODEL_NAME = "Qwen/Qwen2.5-0.5B-Instruct"
-
-
-def assert_gpu():
-    assert torch.cuda.is_available(), (
-        "This program requires GPUs. You can get a free GPU in Google Golab by choose the menu "
-        + "Runtime -> Change runtime type and select a GPU"
-    )
-    print(f"GPU: {torch.cuda.get_device_name(0)}")
-    print(f"Memory: {torch.cuda.get_device_properties(0).total_memory / 1e9:.2f} GB")
 
 
 def model(name: str):
@@ -70,6 +57,7 @@ class Finetuner:
         self.tokenizer.save_pretrained(output_dir)
 
 
+MODEL_NAME = "Qwen/Qwen2.5-0.5B-Instruct"
 cfg = ax.config_for_class(Finetuner).set(
     model_cfg=ax.config_for_function(model).set(name=MODEL_NAME),
     tokenizer_cfg=ax.config_for_function(AutoTokenizer.from_pretrained).set(
@@ -97,10 +85,7 @@ cfg = ax.config_for_class(Finetuner).set(
         dataloader_pin_memory=False,  # Disable pinned memory
     ),
 )
-pprint.pp(cfg.to_dict())
+print(cfg.debug_string())
 
 tunner = cfg.instantiate()
-print(type(tunner))
-
-
 tunner.run()
