@@ -85,5 +85,4 @@ cfg = ax.config_for_class(Finetuner).set(
         dataloader_pin_memory=False,  # Disable pinned memory
     ),
 )
-tunner = cfg.instantiate()
-tunner.run()
+cfg.instantiate().run()
